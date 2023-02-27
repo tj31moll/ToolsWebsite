@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Business Solution Scripts</title>
+</head>
+<body>
+	<h1>Business Solution Scripts</h1>
+	<h2>Duplicate File Remover</h2>
+	<form action="/duplicate_file_remover" method="POST">
+		<label for="directory">Directory Path:</label>
+		<input type="text" id="directory" name="directory">
+		<br>
+		<input type="submit" value="Submit">
+	</form>
+
+	<h2>Password Manager</h2>
+	<form action="/password_manager" method="POST">
+		<label for="length">Password Length:</label>
+		<input type="text" id="length" name="length">
+		<br>
+		<input type="submit" value="Generate Password">
+	</form>
+
+	<h2>Online Form Filler</h2>
+	<form action="/form_filler" method="POST">
+		<label for="name">Name:</label>
+		<input type="text" id="name" name="name">
+		<br>
+		<label for="email">Email:</label>
+		<input type="email" id="email" name="email">
+		<br>
+		<label for="phone">Phone Number:</label>
+		<input type="text" id="phone" name="phone">
+		<br>
+		<input type="submit" value="Submit">
+	</form>
+
+	<h2>Event Invitation Manager</h2>
+	<form action="/event_manager" method="POST">
+		<label for="event">Event Name:</label>
+		<input type="text" id="event" name="event">
+		<br>
+		<label for="date">Date:</label>
+		<input type="date" id="date" name="date">
+		<br>
+		<label for="guests">Guests:</label>
+		<input type="text" id="guests" name="guests">
+		<br>
+		<input type="submit" value="Send Invitations">
+	</form>
+
+	<h2>Product Price Tracker</h2>
+	<form action="/price_tracker" method="POST">
+		<label for="product">Product Name:</label>
+		<input type="text" id="product" name="product">
+		<br>
+		<label for="price">Desired Price:</label>
+		<input type="text" id="price" name="price">
+		<br>
+		<input type="submit" value="Track Price">
+	</form>
+
+	<h2>Resume Scanner</h2>
+	<form action="/resume_scanner" method="POST">
+		<label for="resume">Resume:</label>
+		<textarea id="resume" name="resume"></textarea>
+		<br>
+		<input type="submit" value="Analyze Resume">
+	</form>
+</body>
+</html>
