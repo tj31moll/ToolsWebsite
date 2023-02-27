@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Landing Page</title>
+  <style>
+    /* Basic page styling */
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    /* Styling for links */
+    .link {
+      display: block;
+      background-color: #f1f1f1;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .link a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>My Landing Page</h1>
+
+  <div id="links">
+    <!-- Links will be dynamically added here -->
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script>
+    // Load YAML configuration file
+    fetch('links.yaml')
+      .then(response => response.text())
+      .then(data => {
+        const links = jsyaml.load(data);
+        const linksDiv = document.getElementById('links');
+
+        // Render links
+        links.forEach(link => {
+          const linkDiv = document.createElement('div');
+          linkDiv.classList.add('link');
+
+          const linkTitle = document.createElement('a');
+          linkTitle.innerText = link.title;
+          linkTitle.href = link.url;
+
+          linkDiv.appendChild(linkTitle);
+          linksDiv.appendChild(linkDiv);
+        });
+      })
+      .catch(error => console.error(error));
+  </script>
+</body>
+
+</html>
