@@ -10,6 +10,21 @@ class BookmarkScraper:
         self.bookmark_file = bookmark_file
         self.db_file = db_file
 
+def scrape(self):
+    for bookmark in self.bookmarks:
+        url = bookmark['url']
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                title = soup.title.string.strip()
+                print(f"Title of {url} is {title}")
+            else:
+                print(f"Error: received status code {response.status_code} for {url}")
+        except Exception as e:
+            print(f"Error occurred for {url}: {e}")
+
+
     def scrape(self):
         # Connect to the SQLite database
         conn = sqlite3.connect(self.db_file)
