@@ -108,9 +108,8 @@ class BookmarkApp:
         cursor.execute('SELECT url, tags FROM bookmarks')
         bookmarks = cursor.fetchall()
 
-        # Generate HTML for
-# the bookmarks page
-html = '''
+        # Generate HTML for the bookmarks page
+        html = '''
 <html>
     <head>
         <title>Bookmarks</title>
@@ -124,25 +123,26 @@ html = '''
             </tr>
 '''
 
-# Add a row to the HTML table for each bookmark
-for bookmark in bookmarks:
-    html += f'''
+        # Add a row to the HTML table for each bookmark
+        for bookmark in bookmarks:
+            html += f'''
         <tr>
             <td><a href="{bookmark[0]}">{bookmark[0]}</a></td>
             <td>{bookmark[1]}</td>
         </tr>
     '''
 
-# Close the HTML table and body
-html += '''
+        # Close the HTML table and body
+        html += '''
         </table>
     </body>
 </html>
 '''
 
-# Close the database connection and return the HTML
-conn.close()
-return html
+        # Close the database connection and return the HTML
+        conn.close()
+        return html
+
 
 if __name__ == '__main__':
     # Configure CherryPy
