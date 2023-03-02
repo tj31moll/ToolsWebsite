@@ -10,24 +10,14 @@ class BookmarkScraper:
         self.bookmark_file = bookmark_file
         self.db_file = db_file
 
-def scrape(self):
-    for bookmark in self.bookmarks:
-        url = bookmark['url']
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, 'html.parser')
-                title = soup.title.string.strip()
-                print(f"Title of {url} is {title}")
-            else:
-                print(f"Error: received status code {response.status_code} for {url}")
-        except Exception as e:
-            print(f"Error occurred for {url}: {e}")
-
-
     def scrape(self):
         # Connect to the SQLite database
-        conn = sqlite3.connect(self.db_file)
+        try:
+            conn = sqlite3.connect(self.db_file)
+        except Exception as e:
+            print(f"Error connecting to database: {e}")
+            return
+
         cursor = conn.cursor()
 
         # Create the bookmarks table if it doesn't already exist
@@ -70,13 +60,16 @@ def scrape(self):
                 ''', (url, ', '.join(topics)))
             except Exception as e:
                 # Add the URL and "error" tag to the database
+                print(f"Error scraping {url}: {e}")
                 cursor.execute('''
                     INSERT INTO bookmarks (url, tags) VALUES (?, ?)
                 ''', (url, 'error'))
+                continue
 
         # Commit the changes and close the database connection
         conn.commit()
         conn.close()
+
 
 class BookmarkApp:
     @cherrypy.expose
@@ -116,8 +109,9 @@ class BookmarkApp:
         raise cherrypy.HTTPRedirect('/bookmarks')
 
 
-@cherrypy.expose
-def bookmarks(self):
+    @cherrypy.expose
+    def bookmarks(self):
+        # Connect to the SQLite database and
     # Connect to the SQLite database and retrieve all bookmarks
     # Connect to the SQLite database and retrieve all bookmarks
     conn = sqlite3.connect('bookmarks.db')
