@@ -1,9 +1,8 @@
 import os
-import requests
 import sqlite3
 from bs4 import BeautifulSoup
 import cherrypy
-
+import requests
 
 class BookmarkScraper:
     def __init__(self, bookmark_file, db_file):
@@ -12,12 +11,7 @@ class BookmarkScraper:
 
     def scrape(self):
         # Connect to the SQLite database
-        try:
-            conn = sqlite3.connect(self.db_file)
-        except Exception as e:
-            print(f"Error connecting to database: {e}")
-            return
-
+        conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
 
         # Create the bookmarks table if it doesn't already exist
@@ -43,6 +37,9 @@ class BookmarkScraper:
             url = link['href']
             try:
                 response = requests.get(url)
+                if response.status_code != 200:
+                    raise Exception(f"Received status code {response.status_code} for {url}")
+
                 soup = BeautifulSoup(response.content, 'html.parser')
                 topics = []
 
@@ -60,11 +57,9 @@ class BookmarkScraper:
                 ''', (url, ', '.join(topics)))
             except Exception as e:
                 # Add the URL and "error" tag to the database
-                print(f"Error scraping {url}: {e}")
                 cursor.execute('''
                     INSERT INTO bookmarks (url, tags) VALUES (?, ?)
                 ''', (url, 'error'))
-                continue
 
         # Commit the changes and close the database connection
         conn.commit()
@@ -95,10 +90,7 @@ class BookmarkApp:
         save_path = os.path.abspath(os.path.dirname(__file__))
         file_path = os.path.join(save_path, 'bookmarks.html')
         with open(file_path, 'wb') as f:
-            while True:
-                data = bookmark_file.file.read(8192)
-                if not data:
-                    break
+            for data in iter(lambda: bookmark_file.file.read(8192), b''):
                 f.write(data)
 
         # Scrape the bookmarks and store the tags in the database
@@ -108,46 +100,56 @@ class BookmarkApp:
         # Redirect the user to the bookmarks page
         raise cherrypy.HTTPRedirect('/bookmarks')
 
-
     @cherrypy.expose
     def bookmarks(self):
-        # Connect to the SQLite database and
-    # Connect to the SQLite database and retrieve all bookmarks
-    # Connect to the SQLite database and retrieve all bookmarks
-    conn = sqlite3.connect('bookmarks.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT url, tags FROM bookmarks')
-    bookmarks = cursor.fetchall()
+        # Connect to the SQLite database and retrieve all bookmarks
+        conn = sqlite3.connect('bookmarks.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT url, tags FROM bookmarks')
+        bookmarks = cursor.fetchall()
 
-    # Generate HTML for displaying the bookmarks and their tags
-    html = '''
-            <html>
-                <head>
-                    <title>Bookmarks</title>
-                </head>
-                <body>
-                    <h1>Bookmarks</h1>
-                    <table>
-                        <tr>
-                            <th>URL</th>
-                            <th>Tags</th>
-                        </tr>
-        '''
-    for bookmark in bookmarks:
-        url, tags = bookmark
-        html += f'''
-                    <tr>
-                        <td><a href="{url}">{url}</a></td>
-                        <td>{tags}</td>
-                    </tr>
-                '''
-    html += '''
-                    </table>
-                </body>
-            </html>
-        '''
-    return html
+        # Generate HTML for
+# the bookmarks page
+html = '''
+<html>
+    <head>
+        <title>Bookmarks</title>
+    </head>
+    <body>
+        <h1>Bookmarks</h1>
+        <table>
+            <tr>
+                <th>URL</th>
+                <th>Tags</th>
+            </tr>
+'''
 
+# Add a row to the HTML table for each bookmark
+for bookmark in bookmarks:
+    html += f'''
+        <tr>
+            <td><a href="{bookmark[0]}">{bookmark[0]}</a></td>
+            <td>{bookmark[1]}</td>
+        </tr>
+    '''
+
+# Close the HTML table and body
+html += '''
+        </table>
+    </body>
+</html>
+'''
+
+# Close the database connection and return the HTML
+conn.close()
+return html
 
 if __name__ == '__main__':
+    # Configure CherryPy
+    cherrypy.config.update({
+        'server.socket_host': '0.0.0.0',
+        'server.socket_port': 8080,
+    })
+
+    # Start the CherryPy web server
     cherrypy.quickstart(BookmarkApp())
